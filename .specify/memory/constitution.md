@@ -2,15 +2,13 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 0.0.0 → 1.0.0 (MAJOR: Initial constitution adoption)
+Version change: 1.0.0 → 1.1.0 (MINOR: 新增文件語言規範)
 
-Modified principles: N/A (new document)
+Modified principles:
+  - Governance section: 新增「文件語言規範」子章節
 
 Added sections:
-  - Core Principles (4 principles: Code Quality, Testing Standards, UX Consistency, Performance Requirements)
-  - Quality Gates section
-  - Development Workflow section
-  - Governance section
+  - 文件語言規範 (Documentation Language Standards)
 
 Removed sections: N/A
 
@@ -96,6 +94,29 @@ Follow-up TODOs: None
 
 **Rationale**: 效能直接影響用戶留存率和轉換率，尤其在行動裝置上更為關鍵。
 
+## 文件語言規範
+
+**所有專案文件 MUST 使用繁體中文 (zh-TW) 撰寫。**
+
+- **適用範圍**:
+  - 規格文件 (Specifications): MUST 使用繁體中文
+  - 實作計畫 (Implementation Plans): MUST 使用繁體中文
+  - 用戶導向文件 (User-facing Documentation): MUST 使用繁體中文
+  - README 與 CONTRIBUTING 指南: MUST 使用繁體中文
+  - Commit 訊息描述: SHOULD 使用繁體中文（type prefix 保持英文）
+  - PR 描述與討論: SHOULD 使用繁體中文
+- **例外情況**:
+  - 程式碼內變數、函式、類別名稱: 使用英文（遵循程式語言慣例）
+  - 程式碼註解: MAY 使用英文或繁體中文（保持一致性）
+  - 技術術語無適當中文翻譯時: MAY 保留英文原文並加註說明
+  - 第三方函式庫文件引用: 保持原文
+- **格式要求**:
+  - 中英文混排時，中文與英文/數字之間 SHOULD 加入空格
+  - 標點符號 MUST 使用全形中文標點（，。、；：「」）
+  - 專有名詞首次出現時 SHOULD 附上英文原文（例如：使用者體驗 (User Experience)）
+
+**Rationale**: 本專案目標用戶為台灣市場，使用繁體中文可確保團隊溝通效率，並使文件對目標用戶更加友善。
+
 ## Quality Gates
 
 **所有程式碼變更 MUST 通過以下品質關卡才能合併：**
@@ -155,4 +176,4 @@ Follow-up TODOs: None
   - PATCH: 澄清、措辭或錯字修正
 - **合規審查**: 每季度進行一次 Constitution 合規審查，確保實際執行與規範一致
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-05 | **Last Amended**: 2025-12-05
+**Version**: 1.1.0 | **Ratified**: 2025-12-05 | **Last Amended**: 2025-12-05
