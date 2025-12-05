@@ -2,19 +2,17 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version Change: N/A → 1.0.0 (Initial Release)
-Modified Principles: N/A (Initial)
+Version Change: 1.0.0 → 1.1.0 (MINOR)
+Modified Principles: None
 Added Sections:
-  - Core Principles (4 principles)
-  - Quality Gates
-  - Development Workflow
-  - Governance
-Removed Sections: N/A
+  - Core Principles V. Documentation Language Standards (new principle)
+Removed Sections: None
 Templates Requiring Updates:
   - .specify/templates/plan-template.md: ✅ Compatible (Constitution Check section exists)
   - .specify/templates/spec-template.md: ✅ Compatible (Success Criteria section exists)
   - .specify/templates/tasks-template.md: ✅ Compatible (Phase structure supports principles)
 Follow-up TODOs: None
+Bump Rationale: MINOR version increment for adding a new principle (V. Documentation Language Standards)
 ================================================================================
 -->
 
@@ -90,6 +88,23 @@ The application MUST meet defined performance targets to ensure optimal user exp
 
 **Rationale:** Performance directly impacts user retention, SEO rankings, and operational costs. Slow applications lead to user abandonment.
 
+### V. Documentation Language Standards (NON-NEGOTIABLE)
+
+All project documentation MUST follow defined language standards to ensure consistency and accessibility for the target audience.
+
+**Requirements:**
+
+- All specifications (spec documents) MUST be written in Traditional Chinese (zh-TW)
+- All implementation plans MUST be written in Traditional Chinese (zh-TW)
+- All user-facing documentation MUST be written in Traditional Chinese (zh-TW)
+- This Constitution and other governance documents MUST remain in English
+- Code comments and inline documentation MUST remain in English
+- Commit messages and PR descriptions SHOULD be in English for tooling compatibility
+- Error messages displayed to users MUST be localized to Traditional Chinese (zh-TW)
+- API documentation intended for internal developers MAY remain in English
+
+**Rationale:** Maintaining Traditional Chinese for user-facing and planning documentation ensures accessibility for the primary stakeholder audience, while English governance documents maintain alignment with international development standards and tooling ecosystems.
+
 ## Quality Gates
 
 All code changes MUST pass through these gates before merging:
@@ -143,4 +158,4 @@ This Constitution supersedes all other development practices within the project.
 - Violations MUST be documented with justification if unavoidable
 - Repeated violations without justification may result in PR rejection
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-05 | **Last Amended**: 2025-12-05
+**Version**: 1.1.0 | **Ratified**: 2025-12-05 | **Last Amended**: 2025-12-05
