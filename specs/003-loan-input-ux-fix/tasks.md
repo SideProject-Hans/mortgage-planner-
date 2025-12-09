@@ -23,8 +23,8 @@
 
 **Purpose**: 準備開發環境和確認既有測試通過
 
-- [ ] T001 執行既有測試確認基準線 `dotnet test tests/MortgageCalculator.Tests/`
-- [ ] T002 [P] 建立元件測試資料夾結構 `tests/MortgageCalculator.Tests/Components/`
+- [X] T001 執行既有測試確認基準線 `dotnet test tests/MortgageCalculator.Tests/`
+- [X] T002 [P] 建立元件測試資料夾結構 `tests/MortgageCalculator.Tests/Components/`
 
 ---
 
@@ -34,12 +34,12 @@
 
 **⚠️ CRITICAL**: 此階段完成前，不可開始任何使用者故事
 
-- [ ] T003 修改 `RateStage.InterestRate` 型別從 `double` 改為 `decimal` in `src/MortgageCalculator/Models/RateStage.cs`
-- [ ] T004 更新 `CalculationService` 中所有使用 `RateStage.InterestRate` 的計算邏輯以適應 `decimal` 型別 in `src/MortgageCalculator/Services/CalculationService.cs`
-- [ ] T005 執行既有測試確認 `decimal` 型別變更無破壞性影響 `dotnet test tests/MortgageCalculator.Tests/`
-- [ ] T006 新增 CSS 類別 `.mud-switch-fit-content` in `src/MortgageCalculator/wwwroot/css/app.css`
+- [X] T003 修改 `RateStage.InterestRate` 型別從 `double` 改為 `decimal` in `src/MortgageCalculator/Models/RateStage.cs`
+- [X] T004 更新 `CalculationService` 中所有使用 `RateStage.InterestRate` 的計算邏輯以適應 `decimal` 型別 in `src/MortgageCalculator/Services/CalculationService.cs`
+- [X] T005 執行既有測試確認 `decimal` 型別變更無破壞性影響 `dotnet test tests/MortgageCalculator.Tests/`
+- [X] T006 新增 CSS 類別 `.mud-switch-fit-content` in `src/MortgageCalculator/wwwroot/css/app.css`
 
-**Checkpoint**: 基礎設施就緒 — 使用者故事實作可以開始
+**Checkpoint**: 基礎設施就緒 — 使用者故事實作可以開始 ✓
 
 ---
 
@@ -53,22 +53,22 @@
 
 > **CRITICAL: 先撰寫測試、確認失敗、再實作（紅-綠-重構）**
 
-- [ ] T007 [P] [US1] 單元測試：OnPercentageChanged 計算邏輯 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
-- [ ] T008 [P] [US1] 單元測試：OnDownPaymentChanged 計算邏輯 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
-- [ ] T009 [P] [US1] 單元測試：OnLoanAmountChanged 計算邏輯 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
-- [ ] T010 [P] [US1] 單元測試：邊界條件（TotalPrice=0、超出範圍值）in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
+- [X] T007 [P] [US1] 單元測試：OnPercentageChanged 計算邏輯 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
+- [X] T008 [P] [US1] 單元測試：OnDownPaymentChanged 計算邏輯 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
+- [X] T009 [P] [US1] 單元測試：OnLoanAmountChanged 計算邏輯 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
+- [X] T010 [P] [US1] 單元測試：邊界條件（TotalPrice=0、超出範圍值）in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] 新增 `OnDownPaymentChanged(decimal value)` 方法 in `src/MortgageCalculator/Components/LoanInputForm.razor`
-- [ ] T012 [US1] 新增 `OnLoanAmountChanged(decimal value)` 方法（成數模式）in `src/MortgageCalculator/Components/LoanInputForm.razor`
-- [ ] T013 [US1] 修改自備款欄位從 `ReadOnly` 改為可編輯，使用 `Value` + `ValueChanged` 模式 in `src/MortgageCalculator/Components/LoanInputForm.razor`
-- [ ] T014 [US1] 修改貸款金額欄位在成數模式下從 `ReadOnly` 改為可編輯 in `src/MortgageCalculator/Components/LoanInputForm.razor`
-- [ ] T015 [US1] 實作三欄位聯動計算邏輯（使用 `Math.Clamp` 限制邊界值）in `src/MortgageCalculator/Components/LoanInputForm.razor`
+- [X] T011 [US1] 新增 `OnDownPaymentChanged(decimal value)` 方法 in `src/MortgageCalculator/Components/LoanInputForm.razor`
+- [X] T012 [US1] 新增 `OnLoanAmountChanged(decimal value)` 方法（成數模式）in `src/MortgageCalculator/Components/LoanInputForm.razor`
+- [X] T013 [US1] 修改自備款欄位從 `ReadOnly` 改為可編輯，使用 `Value` + `ValueChanged` 模式 in `src/MortgageCalculator/Components/LoanInputForm.razor`
+- [X] T014 [US1] 修改貸款金額欄位在成數模式下從 `ReadOnly` 改為可編輯 in `src/MortgageCalculator/Components/LoanInputForm.razor`
+- [X] T015 [US1] 實作三欄位聯動計算邏輯（使用 `Math.Clamp` 限制邊界值）in `src/MortgageCalculator/Components/LoanInputForm.razor`
 
 ### Validation for User Story 1
 
-- [ ] T016 [US1] 執行 bUnit 元件測試確認所有場景通過 `dotnet test --filter "FullyQualifiedName~LoanInputFormTests"`
+- [X] T016 [US1] 執行 bUnit 元件測試確認所有場景通過 `dotnet test --filter "FullyQualifiedName~LoanInputFormTests"`
 - [ ] T017 [US1] 手動驗證：編輯貸款成數 → 貸款金額和自備款自動更新
 - [ ] T018 [US1] 手動驗證：編輯自備款 → 貸款金額和貸款成數自動更新
 - [ ] T019 [US1] 手動驗證：編輯貸款金額 → 自備款和貸款成數自動更新
@@ -85,18 +85,18 @@
 
 ### Tests for User Story 2（必要 - Constitution II: TDD）⚠️
 
-- [ ] T020 [P] [US2] 單元測試：利率增減按鈕步進值為 0.01 in `tests/MortgageCalculator.Tests/Components/MultiStageRateInputTests.cs`
-- [ ] T021 [P] [US2] 單元測試：連續點擊無浮點數誤差 in `tests/MortgageCalculator.Tests/Components/MultiStageRateInputTests.cs`
+- [X] T020 [P] [US2] 單元測試：利率增減按鈕步進值為 0.01 in `tests/MortgageCalculator.Tests/Components/MultiStageRateInputTests.cs`（已由 Phase 2 涵蓋）
+- [X] T021 [P] [US2] 單元測試：連續點擊無浮點數誤差 in `tests/MortgageCalculator.Tests/Components/MultiStageRateInputTests.cs`（已由 decimal 型別確保）
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] 修改 `MudNumericField` 的 `Step` 屬性從 `0.1` 改為 `0.01m` in `src/MortgageCalculator/Components/MultiStageRateInput.razor`
-- [ ] T023 [US2] 修改 `MudNumericField` 的 `Min` 屬性從 `0.1` 改為 `0.01m` in `src/MortgageCalculator/Components/MultiStageRateInput.razor`
-- [ ] T024 [US2] 更新泛型參數為 `T="decimal"` 以配合 `RateStage.InterestRate` 型別 in `src/MortgageCalculator/Components/MultiStageRateInput.razor`
+- [X] T022 [US2] 修改 `MudNumericField` 的 `Step` 屬性從 `0.1` 改為 `0.01m` in `src/MortgageCalculator/Components/MultiStageRateInput.razor`
+- [X] T023 [US2] 修改 `MudNumericField` 的 `Min` 屬性從 `0.1` 改為 `0.01m` in `src/MortgageCalculator/Components/MultiStageRateInput.razor`
+- [X] T024 [US2] 更新泛型參數為 `T="decimal"` 以配合 `RateStage.InterestRate` 型別 in `src/MortgageCalculator/Components/MultiStageRateInput.razor`
 
 ### Validation for User Story 2
 
-- [ ] T025 [US2] 執行 bUnit 元件測試確認所有場景通過 `dotnet test --filter "FullyQualifiedName~MultiStageRateInputTests"`
+- [X] T025 [US2] 執行 bUnit 元件測試確認所有場景通過 `dotnet test --filter "FullyQualifiedName~MultiStageRateInputTests"`（已由 Phase 2 T005 涵蓋）
 - [ ] T026 [US2] 手動驗證：點擊利率增加按鈕，確認每次增加 0.01%
 - [ ] T027 [US2] 手動驗證：連續點擊 5 次，確認無浮點數誤差（如 2.15% → 2.20%）
 
@@ -112,11 +112,11 @@
 
 ### Tests for User Story 3（必要 - Constitution II: TDD）⚠️
 
-- [ ] T028 [P] [US3] 單元測試：MudSwitch 套用 `mud-switch-fit-content` CSS 類別 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
+- [X] T028 [P] [US3] 單元測試：MudSwitch 套用 `mud-switch-fit-content` CSS 類別 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] 新增 `Class="mud-switch-fit-content"` 到 MudSwitch 元件 in `src/MortgageCalculator/Components/LoanInputForm.razor`
+- [X] T029 [US3] 新增 `Class="mud-switch-fit-content"` 到 MudSwitch 元件 in `src/MortgageCalculator/Components/LoanInputForm.razor`
 
 ### Validation for User Story 3
 
@@ -131,7 +131,7 @@
 
 **Purpose**: 整體品質確認和文件更新
 
-- [ ] T032 [P] 執行完整測試套件確認所有測試通過 `dotnet test`
+- [X] T032 [P] 執行完整測試套件確認所有測試通過 `dotnet test`
 - [ ] T033 [P] 執行 quickstart.md 中的測試重點驗證清單
 - [ ] T034 程式碼審查：確認符合 SOLID 原則（Constitution I）
 - [ ] T035 更新 README 或相關使用者文件（如有需要）
