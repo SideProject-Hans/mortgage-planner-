@@ -352,15 +352,55 @@
     {
         if (result == null) return;
 
-        // Sample data points to avoid overcrowding the chart (e.g., every 12th month)
-        var sampledSchedule = result.Schedule.Where((x, i) => i % 12 == 0 || i == result.Schedule.Count - 1).ToList();
+        // Calculate total years and determine sampling interval
+        // FR-003: Long-term loans (>5 years) sample every 5 years; short-term (≤5 years) every year
+        var totalYears = (int)Math.Ceiling(result.Schedule.Count / 12.0);
+        var intervalYears = totalYears <= 5 ? 1 : 5;
 
-        XAxisLabels = sampledSchedule.Select(x => $"第{x.Period}期").ToArray();
+        var labels = new List<string>();
+        var balanceData = new List<double>();
+        var interestData = new List<double>();
+
+        // Initial balance (Year 0)
+        var initialBalance = result.TotalPayment - result.TotalInterest;
+
+        for (int year = 0; year <= totalYears; year += intervalYears)
+        {
+            // FR-005: Ensure maximum 10 data points
+            if (labels.Count >= 10)
+                break;
+
+            // FR-004: X-axis labels use "Y{n}" format
+            labels.Add($"Y{year}");
+
+            if (year == 0)
+            {
+                balanceData.Add((double)initialBalance);
+                interestData.Add(0);
+            }
+            else
+            {
+                int monthIndex = year * 12;
+                if (monthIndex >= result.Schedule.Count)
+                {
+                    balanceData.Add(0);
+                    interestData.Add((double)result.TotalInterest);
+                }
+                else
+                {
+                    var scheduleItem = result.Schedule[monthIndex - 1];
+                    balanceData.Add((double)scheduleItem.RemainingBalance);
+                    interestData.Add((double)result.Schedule.Take(monthIndex).Sum(s => s.InterestPayment));
+                }
+            }
+        }
+
+        XAxisLabels = labels.ToArray();
 
         Series = new List<ChartSeries>()
         {
-            new ChartSeries() { Name = "剩餘本金", Data = sampledSchedule.Select(x => (double)x.RemainingBalance).ToArray() },
-            new ChartSeries() { Name = "累計利息", Data = sampledSchedule.Select(x => (double)result.Schedule.Take(x.Period).Sum(s => s.InterestPayment)).ToArray() }
+            new ChartSeries() { Name = "剩餘本金", Data = balanceData.ToArray() },
+            new ChartSeries() { Name = "累計利息", Data = interestData.ToArray() }
         };
     }
 
