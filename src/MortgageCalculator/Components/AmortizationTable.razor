@@ -1,0 +1,24 @@
+@using MortgageCalculator.Models
+@using MudBlazor
+
+<MudTable Items="@Schedule" Hover="true" Striped="true" Dense="true" Breakpoint="Breakpoint.Sm" Loading="@(Schedule == null)" LoadingProgressColor="Color.Info" Virtualize="true" Height="400px" FixedHeader="true">
+    <HeaderContent>
+        <MudTh>期數</MudTh>
+        <MudTh>本金</MudTh>
+        <MudTh>利息</MudTh>
+        <MudTh>本期應繳金額</MudTh>
+        <MudTh>剩餘本金</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="期數">@context.Period</MudTd>
+        <MudTd DataLabel="本金">@context.PrincipalPayment.ToString("N0")</MudTd>
+        <MudTd DataLabel="利息">@context.InterestPayment.ToString("N0")</MudTd>
+        <MudTd DataLabel="本期應繳金額">@context.TotalPayment.ToString("N0")</MudTd>
+        <MudTd DataLabel="剩餘本金">@context.RemainingBalance.ToString("N0")</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public List<AmortizationScheduleItem> Schedule { get; set; } = new();
+}

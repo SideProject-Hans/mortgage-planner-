@@ -1,0 +1,80 @@
+@using MortgageCalculator.Models
+@using MortgageCalculator.Services
+@inject IStorageService StorageService
+@inject IDialogService DialogService
+
+<MudList T="SavedCalculation">
+    @if (_calculations == null)
+    {
+        <MudListItem>
+            <MudText>Loading...</MudText>
+        </MudListItem>
+    }
+    else if (!_calculations.Any())
+    {
+        <MudListItem>
+            <MudText>No saved calculations found.</MudText>
+        </MudListItem>
+    }
+    else
+    {
+        @foreach (var calc in _calculations.OrderByDescending(x => x.Timestamp))
+        {
+            <MudListItem>
+                <div class="d-flex justify-space-between align-center">
+                    <div @onclick="() => OnLoad(calc)" style="cursor:pointer; width: 100%">
+                        <MudText Typo="Typo.subtitle1">@calc.Name</MudText>
+                        <MudText Typo="Typo.caption">@calc.Timestamp.ToString("g")</MudText>
+                        <MudText Typo="Typo.body2">@calc.LoanInput.LoanAmount.ToString("N0") / @calc.LoanInput.LoanTermYears Years</MudText>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => OnDelete(calc)" />
+                </div>
+            </MudListItem>
+            <MudDivider />
+        }
+    }
+</MudList>
+
+@code {
+    [Parameter] public EventCallback<SavedCalculation> OnLoadCalculation { get; set; }
+
+    private List<SavedCalculation>? _calculations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _calculations = await StorageService.GetHistoryAsync();
+    }
+
+    private async Task OnLoad(SavedCalculation calc)
+    {
+        if (OnLoadCalculation.HasDelegate)
+        {
+            await OnLoadCalculation.InvokeAsync(calc);
+        }
+    }
+
+    private async Task OnDelete(SavedCalculation calc)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Delete Calculation", 
+            $"Are you sure you want to delete '{calc.Name}'?", 
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            await StorageService.DeleteCalculationAsync(calc.Id);
+            await LoadData();
+        }
+    }
+    
+    public async Task Refresh()
+    {
+        await LoadData();
+        StateHasChanged();
+    }
+}

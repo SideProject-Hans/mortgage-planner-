@@ -16,3 +16,7 @@ node_modules/
 !chatmodes/
 !instructions/
 !prompts/
+bin/
+obj/
+.vs/
+*.user
