@@ -5,7 +5,7 @@
     <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12">
-            <MudSwitch @bind-Value="isPercentageMode" Label="使用房價與成數計算" Color="Color.Primary" />
+            <MudSwitch @bind-Value="isPercentageMode" Label="使用房價與成數計算" Color="Color.Primary" Class="mud-switch-fit-content" />
         </MudItem>
 
         @if (isPercentageMode)
@@ -17,17 +17,22 @@
                 <MudNumericField Value="LoanInput.LoanPercentage" ValueChanged="@((double v) => OnPercentageChanged(v))" Label="貸款成數 (%)" Variant="Variant.Outlined" Min="0" Max="100" Step="5" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Percent" />
             </MudItem>
             <MudItem xs="12" sm="6">
-                <MudNumericField Value="@(LoanInput.TotalPrice - LoanInput.LoanAmount)" Label="自備款 (元)" Variant="Variant.Outlined" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                <MudNumericField Value="@DownPayment" ValueChanged="@((decimal v) => OnDownPaymentChanged(v))" Label="自備款 (元)" Variant="Variant.Outlined" Min="0" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudNumericField Value="LoanInput.LoanAmount" ValueChanged="@((decimal v) => OnLoanAmountChanged(v))" Label="貸款金額 (元)" Variant="Variant.Outlined" Min="0" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+            </MudItem>
+        }
+        else
+        {
+            <MudItem xs="12" sm="6">
+                <MudNumericField @bind-Value="LoanInput.LoanAmount" Label="貸款金額 (元)" Variant="Variant.Outlined" Min="10000" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                <ValidationMessage For="@(() => LoanInput.LoanAmount)" />
             </MudItem>
         }
 
-        <MudItem xs="12" sm="6">
-            <MudNumericField @bind-Value="LoanInput.LoanAmount" Label="貸款金額 (元)" Variant="Variant.Outlined" Min="10000" ReadOnly="@isPercentageMode" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
-            <ValidationMessage For="@(() => LoanInput.LoanAmount)" />
-        </MudItem>
-
         <MudItem xs="12">
-            <MudSwitch @bind-Value="isMultiStageRate" Label="使用分段利率" Color="Color.Secondary" />
+            <MudSwitch @bind-Value="isMultiStageRate" Label="使用分段利率" Color="Color.Secondary" Class="mud-switch-fit-content" />
         </MudItem>
 
         @if (isMultiStageRate)
@@ -71,21 +76,44 @@
     private bool isPercentageMode = false;
     private bool isMultiStageRate = false;
 
+    private decimal DownPayment => LoanInput.TotalPrice - LoanInput.LoanAmount;
+
     private void OnTotalPriceChanged(decimal value)
     {
-        LoanInput.TotalPrice = value;
-        CalculateLoanAmount();
+        LoanInput.TotalPrice = Math.Max(0, value);
+        RecalculateFromPercentage();
     }
 
     private void OnPercentageChanged(double value)
     {
-        LoanInput.LoanPercentage = value;
-        CalculateLoanAmount();
+        LoanInput.LoanPercentage = Math.Clamp(value, 0, 100);
+        RecalculateFromPercentage();
     }
 
-    private void CalculateLoanAmount()
+    private void OnDownPaymentChanged(decimal value)
     {
-        if (isPercentageMode)
+        var clampedDownPayment = Math.Clamp(value, 0, LoanInput.TotalPrice);
+        LoanInput.LoanAmount = LoanInput.TotalPrice - clampedDownPayment;
+        
+        if (LoanInput.TotalPrice > 0)
+        {
+            LoanInput.LoanPercentage = (double)(LoanInput.LoanAmount / LoanInput.TotalPrice * 100);
+        }
+    }
+
+    private void OnLoanAmountChanged(decimal value)
+    {
+        LoanInput.LoanAmount = Math.Clamp(value, 0, LoanInput.TotalPrice);
+        
+        if (LoanInput.TotalPrice > 0)
+        {
+            LoanInput.LoanPercentage = (double)(LoanInput.LoanAmount / LoanInput.TotalPrice * 100);
+        }
+    }
+
+    private void RecalculateFromPercentage()
+    {
+        if (isPercentageMode && LoanInput.TotalPrice > 0)
         {
             LoanInput.LoanAmount = Math.Round(LoanInput.TotalPrice * (decimal)(LoanInput.LoanPercentage / 100), 0);
         }

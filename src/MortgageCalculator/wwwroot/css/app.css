@@ -113,3 +113,8 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Limit MudSwitch clickable area to fit content only */
+.mud-switch-fit-content {
+    width: fit-content !important;
+}
