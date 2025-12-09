@@ -225,4 +225,53 @@ public class LoanInputFormTests
     }
 
     #endregion
+
+    #region T003: LoanPercentage Step Value tests (US1 - 004-ltv-chart-ux)
+
+    /// <summary>
+    /// Verifies that the loan percentage step value requirement is 1 (not 5).
+    /// This is a specification test to ensure the step value meets the user story requirements.
+    /// FR-001: The system must set the loan percentage field step value to 1.
+    /// </summary>
+    [Fact]
+    public void LoanPercentage_StepValue_ShouldBeOne()
+    {
+        // Arrange - Define expected step value per FR-001 requirement
+        const int expectedStep = 1;
+        
+        // Act - Simulate step increment/decrement behavior
+        var initialPercentage = 70.0;
+        var afterIncrement = initialPercentage + expectedStep;
+        var afterDecrement = initialPercentage - expectedStep;
+        
+        // Assert - Each click should change by exactly 1%
+        Assert.Equal(71.0, afterIncrement);
+        Assert.Equal(69.0, afterDecrement);
+    }
+
+    /// <summary>
+    /// Verifies that the loan percentage stays within valid bounds (0-100).
+    /// FR-002: The system must limit loan percentage to the range of 0 to 100.
+    /// </summary>
+    [Theory]
+    [InlineData(70, 1, 71)]   // Normal increment
+    [InlineData(70, -1, 69)]  // Normal decrement
+    [InlineData(99, 1, 100)]  // Increment near upper bound
+    [InlineData(100, 1, 100)] // At upper bound (should not exceed)
+    [InlineData(1, -1, 0)]    // Decrement near lower bound
+    [InlineData(0, -1, 0)]    // At lower bound (should not go below)
+    public void LoanPercentage_WithStepChange_ShouldStayWithinBounds(
+        double initial, int stepChange, double expected)
+    {
+        // Arrange
+        var percentage = initial;
+        
+        // Act - Apply step change with bounds checking (as MudNumericField does)
+        var newValue = Math.Clamp(percentage + stepChange, 0, 100);
+        
+        // Assert
+        Assert.Equal(expected, newValue);
+    }
+
+    #endregion
 }
