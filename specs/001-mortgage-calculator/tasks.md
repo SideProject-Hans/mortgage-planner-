@@ -124,3 +124,42 @@
 2.  **Enhanced UX (Phase 4-5)**: Make it usable with better inputs and charts.
 3.  **Advanced Features (Phase 6-8)**: Add the "Planner" capabilities (Compare, Save, Affordability).
 4.  **Polish (Phase 9)**: Finalize for release.
+
+---
+
+## Issue Log
+
+### ISS-001: MudBlazor Component Rendering Errors (2025-12-09)
+
+**狀態**: ✅ 已解決
+
+**錯誤訊息**:
+- `Missing <MudPopoverProvider />, please add it to your layout`
+- `Could not find 'mudElementRef.getBoundingClientRect' ('mudElementRef' was undefined)`
+- `Could not find 'mudElementRef.addOnBlurEvent' ('mudElementRef' was undefined)`
+
+**根本原因**:
+MudBlazor 初始設定不完整，導致元件無法正確渲染：
+1. `MainLayout.razor` 缺少 `<MudPopoverProvider />` - 這是 MudBlazor 彈出式元件（Popover、Menu、Select 等）的必要 Provider
+2. `index.html` 缺少 MudBlazor 的 CSS 和 JavaScript 引用 - 導致 JS Interop 函式 (`mudElementRef`) 未定義
+
+**修復方式**:
+
+| 檔案 | 變更內容 |
+|------|----------|
+| `src/MortgageCalculator/Layout/MainLayout.razor` | 加入 `<MudPopoverProvider />` |
+| `src/MortgageCalculator/wwwroot/index.html` | 加入 MudBlazor CSS (`_content/MudBlazor/MudBlazor.min.css`) |
+| `src/MortgageCalculator/wwwroot/index.html` | 加入 MudBlazor JS (`_content/MudBlazor/MudBlazor.min.js`) |
+| `src/MortgageCalculator/wwwroot/index.html` | 加入 Roboto 字型引用 |
+| `src/MortgageCalculator/wwwroot/index.html` | 移除未使用的 Bootstrap CSS |
+
+**教訓學習**:
+- MudBlazor 需要完整的設定才能正常運作，包含：
+  1. **NuGet 套件** (`MudBlazor`)
+  2. **服務註冊** (`builder.Services.AddMudServices()`)
+  3. **所有 Providers** (`MudThemeProvider`, `MudPopoverProvider`, `MudDialogProvider`, `MudSnackbarProvider`)
+  4. **CSS 引用** (`_content/MudBlazor/MudBlazor.min.css`)
+  5. **JS 引用** (`_content/MudBlazor/MudBlazor.min.js`)
+- 官方文件：https://mudblazor.com/getting-started/installation
+
+**相關任務**: T010 (Setup MainLayout.razor)
