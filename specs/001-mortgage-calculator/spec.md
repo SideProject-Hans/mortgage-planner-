@@ -5,6 +5,15 @@
 **Status**: Draft
 **Input**: User description: "房屋貸款試算小工具 - 輸入房屋總價、貸款金額或成數（可切換）、貸款年限（預設30年）、利率（預設2.5%）、還款方式（等額本息或等額本金），試算後顯示每月還款金額"
 
+## Clarifications
+
+### Session 2025-12-09
+- Q: Tech Stack? → A: C# Blazor (WebAssembly implied by "pure frontend" requirement)
+- Q: UI Component Library? → A: MudBlazor (Material Design, built-in charts)
+- Q: Data Persistence? → A: LocalStorage (Blazored.LocalStorage recommended)
+- Q: Navigation Structure? → A: Single Page Dashboard (All tools on one scrollable view)
+- Q: .NET Version? → A: .NET 8 (LTS)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - 基本房貸試算 (Priority: P1)
@@ -335,6 +344,17 @@
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
+
+**Technical Stack**
+
+- **TR-001**: 應用程式必須使用 C# Blazor WebAssembly 框架開發
+- **TR-002**: 應用程式必須為純前端架構（Static Web App），不依賴後端 API 進行計算
+
+- **TR-003**: 應用程式必須使用 MudBlazor 元件庫進行 UI 開發
+- **TR-004**: 應用程式必須使用 MudBlazor 內建圖表元件繪製還款曲線
+- **TR-005**: 應用程式必須使用 LocalStorage 儲存使用者試算記錄（建議使用 Blazored.LocalStorage）
+- **TR-006**: 應用程式必須採用單頁式儀表板（Single Page Dashboard）設計，將所有功能整合於單一捲動視圖中
+- **TR-007**: 應用程式必須使用 .NET 8 (LTS) 版本進行開發
 
 **輸入相關**
 
