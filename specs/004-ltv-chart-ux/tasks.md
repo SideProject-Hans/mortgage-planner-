@@ -27,8 +27,8 @@ description: "Task list for LTV and Chart UX optimization feature"
 
 **Purpose**: 確認開發環境與測試框架就緒
 
-- [ ] T001 確認專案結構並驗證測試框架可正常執行 (`dotnet test`)
-- [ ] T002 [P] 建立測試檔案 `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
+- [x] T001 確認專案結構並驗證測試框架可正常執行 (`dotnet test`)
+- [x] T002 [P] 建立測試檔案 `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
 
 ---
 
@@ -52,15 +52,15 @@ description: "Task list for LTV and Chart UX optimization feature"
 
 > **CRITICAL: 先撰寫測試，確認測試失敗，再實作 (Red-Green-Refactor)**
 
-- [ ] T003 [P] [US1] 單元測試：驗證 LoanPercentage 欄位 Step 屬性為 1 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
+- [x] T003 [P] [US1] 單元測試：驗證 LoanPercentage 欄位 Step 屬性為 1 in `tests/MortgageCalculator.Tests/Components/LoanInputFormTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] 修改 `src/MortgageCalculator/Components/LoanInputForm.razor` 第 17 行: `Step="5"` → `Step="1"`
+- [x] T004 [US1] 修改 `src/MortgageCalculator/Components/LoanInputForm.razor` 第 17 行: `Step="5"` → `Step="1"`
 
 ### Validation for User Story 1
 
-- [ ] T005 [US1] 執行測試並驗證通過 (`dotnet test --filter "LoanPercentage"`)
+- [x] T005 [US1] 執行測試並驗證通過 (`dotnet test --filter "LoanPercentage"`)
 - [ ] T006 [US1] 手動驗證：開啟應用程式，確認貸款成數步進值為 1
 
 **Checkpoint**: 此時 User Story 1 應完全可用且通過測試
@@ -77,20 +77,20 @@ description: "Task list for LTV and Chart UX optimization feature"
 
 > **CRITICAL: 先撰寫測試，確認測試失敗，再實作 (Red-Green-Refactor)**
 
-- [ ] T007 [P] [US2] 單元測試：驗證長期貸款 (30年) 圖表取樣間隔為 5 年 in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
-- [ ] T008 [P] [US2] 單元測試：驗證短期貸款 (5年) 圖表取樣間隔為 1 年 in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
-- [ ] T009 [P] [US2] 單元測試：驗證 X 軸標籤格式為 "Y{n}" in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
-- [ ] T010 [P] [US2] 單元測試：驗證圖表資料點數量不超過 10 個 in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
+- [x] T007 [P] [US2] 單元測試：驗證長期貸款 (30年) 圖表取樣間隔為 5 年 in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
+- [x] T008 [P] [US2] 單元測試：驗證短期貸款 (5年) 圖表取樣間隔為 1 年 in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
+- [x] T009 [P] [US2] 單元測試：驗證 X 軸標籤格式為 "Y{n}" in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
+- [x] T010 [P] [US2] 單元測試：驗證圖表資料點數量不超過 10 個 in `tests/MortgageCalculator.Tests/Pages/CalculatorPageTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] 提取 `UpdateChart()` 取樣邏輯為可測試的靜態方法 in `src/MortgageCalculator/Pages/CalculatorPage.razor`
-- [ ] T012 [US2] 實作新的取樣邏輯：長期貸款 (>5年) 5 年間隔, 短期貸款 (≤5年) 1 年間隔 in `src/MortgageCalculator/Pages/CalculatorPage.razor`
-- [ ] T013 [US2] 修改 X 軸標籤格式為 "Y{n}" in `src/MortgageCalculator/Pages/CalculatorPage.razor`
+- [x] T011 [US2] 提取 `UpdateChart()` 取樣邏輯為可測試的靜態方法 in `src/MortgageCalculator/Pages/CalculatorPage.razor`
+- [x] T012 [US2] 實作新的取樣邏輯：長期貸款 (>5年) 5 年間隔, 短期貸款 (≤5年) 1 年間隔 in `src/MortgageCalculator/Pages/CalculatorPage.razor`
+- [x] T013 [US2] 修改 X 軸標籤格式為 "Y{n}" in `src/MortgageCalculator/Pages/CalculatorPage.razor`
 
 ### Validation for User Story 2
 
-- [ ] T014 [US2] 執行測試並驗證通過 (`dotnet test --filter "Chart"`)
+- [x] T014 [US2] 執行測試並驗證通過 (`dotnet test --filter "Chart"`)
 - [ ] T015 [US2] 手動驗證：30 年期貸款圖表資料點數量 ≤ 10
 - [ ] T016 [US2] 手動驗證：5 年期貸款圖表以每年取樣
 - [ ] T017 [US2] 手動驗證：X 軸標籤格式為 Y0, Y5, Y10...
@@ -104,9 +104,9 @@ description: "Task list for LTV and Chart UX optimization feature"
 **Purpose**: 最終驗證與清理
 
 - [ ] T018 執行 `quickstart.md` 中的所有驗證步驟
-- [ ] T019 執行完整測試套件 (`dotnet test`)
-- [ ] T020 程式碼審查：確認符合 SOLID 原則 (Constitution I)
-- [ ] T021 更新 `specs/004-ltv-chart-ux/checklists/requirements.md` 確認所有需求已實現
+- [x] T019 執行完整測試套件 (`dotnet test`)
+- [x] T020 程式碼審查：確認符合 SOLID 原則 (Constitution I)
+- [x] T021 更新 `specs/004-ltv-chart-ux/checklists/requirements.md` 確認所有需求已實現
 
 ---
 
