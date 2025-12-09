@@ -81,8 +81,8 @@ public class CalculationServiceTests
             GracePeriodMonths = 0,
             RateStages = new List<RateStage>
             {
-                new RateStage { DurationMonths = 12, InterestRate = 2.0 },
-                new RateStage { DurationMonths = 12, InterestRate = 3.0 }
+                new RateStage { DurationMonths = 12, InterestRate = 2.0m },
+                new RateStage { DurationMonths = 12, InterestRate = 3.0m }
             }
         };
 
