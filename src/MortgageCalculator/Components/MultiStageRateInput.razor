@@ -9,7 +9,7 @@
             <MudNumericField @bind-Value="stage.value.DurationMonths" Label="期間 (月)" Variant="Variant.Outlined" Min="1" />
         </MudItem>
         <MudItem xs="5">
-            <MudNumericField @bind-Value="stage.value.InterestRate" Label="利率 (%)" Variant="Variant.Outlined" Min="0.1" Step="0.1" />
+            <MudNumericField T="decimal" @bind-Value="stage.value.InterestRate" Label="利率 (%)" Variant="Variant.Outlined" Min="0.01m" Step="0.01m" />
         </MudItem>
         <MudItem xs="2">
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveStage(stage.value))" />
@@ -24,7 +24,7 @@
 
     private void AddStage()
     {
-        RateStages.Add(new RateStage { DurationMonths = 12, InterestRate = 2.0 });
+        RateStages.Add(new RateStage { DurationMonths = 12, InterestRate = 2.0m });
     }
 
     private void RemoveStage(RateStage stage)

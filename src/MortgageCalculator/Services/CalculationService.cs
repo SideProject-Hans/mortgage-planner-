@@ -33,11 +33,11 @@ public class CalculationService : ICalculationService
             currentMonthCount += stage.DurationMonths;
             if (month <= currentMonthCount)
             {
-                return stage.InterestRate / 12 / 100;
+                return (double)stage.InterestRate / 12 / 100;
             }
         }
 
-        return input.RateStages.Last().InterestRate / 12 / 100;
+        return (double)input.RateStages.Last().InterestRate / 12 / 100;
     }
 
     private void CalculatePrincipalOnly(LoanInput input, LoanResult result)
