@@ -146,7 +146,7 @@
     public string[] ComparisonXAxisLabels { get; set; } = { };
 
     private bool _drawerOpen = false;
-    private SavedCalculationsList _savedList;
+    private SavedCalculationsList? _savedList;
 
     private void ToggleHistory()
     {
@@ -161,9 +161,9 @@
         var dialog = await DialogService.ShowAsync<PromptDialog>("Save Calculation", parameters);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result != null && !result.Canceled && result.Data != null)
         {
-            var name = result.Data.ToString();
+            var name = result.Data.ToString() ?? $"Calculation {DateTime.Now:yyyy-MM-dd HH:mm}";
             var savedCalc = new SavedCalculation
             {
                 Id = Guid.NewGuid(),
@@ -179,13 +179,14 @@
 
     private void LoadCalculation(SavedCalculation calc)
     {
+        var loadedInput = calc.LoanInput ?? new LoanInput { LoanTermYears = 30, AnnualInterestRate = 2.5 };
         if (isComparisonMode)
         {
-            loanInputA = calc.LoanInput;
+            loanInputA = loadedInput;
         }
         else
         {
-            loanInput = calc.LoanInput;
+            loanInput = loadedInput;
         }
         
         if (isComparisonMode) CalculateComparison();
