@@ -1,0 +1,34 @@
+@using MortgageCalculator.Models
+
+<MudText Typo="Typo.subtitle1" Class="mt-4">分段利率設定</MudText>
+
+@foreach (var stage in RateStages.Select((value, index) => new { value, index }))
+{
+    <MudGrid Class="align-center">
+        <MudItem xs="5">
+            <MudNumericField @bind-Value="stage.value.DurationMonths" Label="期間 (月)" Variant="Variant.Outlined" Min="1" />
+        </MudItem>
+        <MudItem xs="5">
+            <MudNumericField @bind-Value="stage.value.InterestRate" Label="利率 (%)" Variant="Variant.Outlined" Min="0.1" Step="0.1" />
+        </MudItem>
+        <MudItem xs="2">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveStage(stage.value))" />
+        </MudItem>
+    </MudGrid>
+}
+
+<MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="AddStage" Class="mt-2" StartIcon="@Icons.Material.Filled.Add">新增分段</MudButton>
+
+@code {
+    [Parameter] public List<RateStage> RateStages { get; set; } = new List<RateStage>();
+
+    private void AddStage()
+    {
+        RateStages.Add(new RateStage { DurationMonths = 12, InterestRate = 2.0 });
+    }
+
+    private void RemoveStage(RateStage stage)
+    {
+        RateStages.Remove(stage);
+    }
+}

@@ -1,0 +1,85 @@
+@using MortgageCalculator.Models
+
+<MudCard Class="mt-4">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">方案比較</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="4">
+                <MudText Typo="Typo.subtitle1" Class="font-weight-bold">項目</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.subtitle1" Class="font-weight-bold">方案 A</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Typo="Typo.subtitle1" Class="font-weight-bold">方案 B</MudText>
+            </MudItem>
+
+            <MudItem xs="12"><MudDivider /></MudItem>
+
+            <MudItem xs="4">
+                <MudText>月付金 (首月)</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText>@ResultA?.MonthlyPayment.ToString("N0")</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Color="@GetColor(ResultB?.MonthlyPayment, ResultA?.MonthlyPayment)">
+                    @ResultB?.MonthlyPayment.ToString("N0") 
+                    <MudText Typo="Typo.caption" Inline="true">(@GetDiff(ResultB?.MonthlyPayment, ResultA?.MonthlyPayment))</MudText>
+                </MudText>
+            </MudItem>
+
+            <MudItem xs="12"><MudDivider /></MudItem>
+
+            <MudItem xs="4">
+                <MudText>總支出</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText>@ResultA?.TotalPayment.ToString("N0")</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Color="@GetColor(ResultB?.TotalPayment, ResultA?.TotalPayment)">
+                    @ResultB?.TotalPayment.ToString("N0")
+                    <MudText Typo="Typo.caption" Inline="true">(@GetDiff(ResultB?.TotalPayment, ResultA?.TotalPayment))</MudText>
+                </MudText>
+            </MudItem>
+
+            <MudItem xs="12"><MudDivider /></MudItem>
+
+            <MudItem xs="4">
+                <MudText>總利息</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText>@ResultA?.TotalInterest.ToString("N0")</MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudText Color="@GetColor(ResultB?.TotalInterest, ResultA?.TotalInterest)">
+                    @ResultB?.TotalInterest.ToString("N0")
+                    <MudText Typo="Typo.caption" Inline="true">(@GetDiff(ResultB?.TotalInterest, ResultA?.TotalInterest))</MudText>
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public LoanResult? ResultA { get; set; }
+    [Parameter] public LoanResult? ResultB { get; set; }
+
+    private string GetDiff(decimal? b, decimal? a)
+    {
+        if (b == null || a == null) return "";
+        decimal diff = b.Value - a.Value;
+        return diff > 0 ? $"+{diff:N0}" : $"{diff:N0}";
+    }
+
+    private Color GetColor(decimal? b, decimal? a)
+    {
+        if (b == null || a == null) return Color.Default;
+        return b < a ? Color.Success : (b > a ? Color.Error : Color.Default);
+    }
+}

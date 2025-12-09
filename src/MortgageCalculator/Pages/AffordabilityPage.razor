@@ -1,0 +1,80 @@
+@page "/affordability"
+@using MortgageCalculator.Models
+@using MortgageCalculator.Services
+@inject ICalculationService CalculationService
+
+<PageTitle>購屋負擔能力試算</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h3" GutterBottom="true">購屋負擔能力試算</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-4">輸入您的收入與支出，評估您能負擔的房貸金額。</MudText>
+
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4">
+                <MudText Typo="Typo.h5" Class="mb-4">輸入資料</MudText>
+                <MudForm @ref="form" @bind-IsValid="@success">
+                    <MudNumericField @bind-Value="input.MonthlyIncome" Label="月收入 (TWD)" Variant="Variant.Outlined" Min="0" Step="1000" Format="N0" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                    <MudNumericField @bind-Value="input.MonthlyDebt" Label="每月債務支出 (TWD)" Variant="Variant.Outlined" Min="0" Step="1000" Format="N0" HelperText="如車貸、信貸、信用卡費等" />
+                    <MudNumericField @bind-Value="input.LoanTermYears" Label="貸款年限 (年)" Variant="Variant.Outlined" Min="1" Max="40" Step="1" />
+                    <MudNumericField @bind-Value="input.AnnualInterestRate" Label="年利率 (%)" Variant="Variant.Outlined" Min="0" Max="20" Step="0.01" />
+                    <MudNumericField @bind-Value="input.MaxDTI" Label="最高負債比 (%)" Variant="Variant.Outlined" Min="10" Max="80" Step="1" HelperText="建議不超過 60-70%" />
+                    
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Calculate" Class="mt-4" Disabled="@(!success)">開始試算</MudButton>
+                </MudForm>
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            @if (result != null)
+            {
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.h5" Class="mb-4">試算結果</MudText>
+                    
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.subtitle2">最高可負擔貸款金額</MudText>
+                            <MudText Typo="Typo.h4" Color="Color.Success">@result.MaxLoanAmount.ToString("N0") TWD</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.subtitle2">最高每月房貸支出</MudText>
+                            <MudText Typo="Typo.h5">@result.MaxMonthlyPayment.ToString("N0") TWD</MudText>
+                        </MudItem>
+                    </MudGrid>
+
+                    @if (result.Suggestions.Any())
+                    {
+                        <MudDivider Class="my-4" />
+                        <MudText Typo="Typo.h6" Class="mb-2">建議</MudText>
+                        <MudList T="string">
+                            @foreach (var suggestion in result.Suggestions)
+                            {
+                                <MudListItem Icon="@Icons.Material.Filled.Info" IconColor="Color.Info">
+                                    @suggestion
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                </MudPaper>
+            }
+            else
+            {
+                <MudPaper Class="pa-4 d-flex justify-center align-center" Style="height: 100%;">
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">請輸入資料並點擊「開始試算」查看結果</MudText>
+                </MudPaper>
+            }
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private AffordabilityInput input = new AffordabilityInput();
+    private AffordabilityResult? result;
+    private MudForm form = default!;
+    private bool success;
+
+    private void Calculate()
+    {
+        result = CalculationService.CalculateAffordability(input);
+    }
+}

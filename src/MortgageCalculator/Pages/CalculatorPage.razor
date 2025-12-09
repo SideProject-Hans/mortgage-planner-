@@ -1,0 +1,415 @@
+@page "/"
+@page "/calculator"
+@using MortgageCalculator.Models
+@using MortgageCalculator.Services
+@using MortgageCalculator.Components
+@inject ICalculationService CalculationService
+@inject IStorageService StorageService
+@inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">房貸試算器</MudText>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudToolBar>
+            <MudText Typo="Typo.h6">試算模式</MudText>
+            <MudSpacer />
+            <MudButton StartIcon="@Icons.Material.Filled.Save" OnClick="SaveCalculation" Variant="Variant.Text" Color="Color.Primary">儲存</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.History" OnClick="ToggleHistory" Variant="Variant.Text" Color="Color.Secondary">歷史紀錄</MudButton>
+            <MudDivider Vertical="true" FlexItem="true" Class="mx-4" />
+            <MudToggleGroup T="bool" SelectionMode="SelectionMode.SingleSelection" @bind-Value="isComparisonMode" Color="Color.Primary" CheckMark="true">
+                <MudToggleItem Value="false" Text="單一試算" />
+                <MudToggleItem Value="true" Text="方案比較" />
+            </MudToggleGroup>
+        </MudToolBar>
+    </MudPaper>
+
+    <MudDrawer @bind-Open="@_drawerOpen" Anchor="Anchor.Right" Elevation="1" Variant="DrawerVariant.Temporary" Width="300px">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">歷史紀錄</MudText>
+        </MudDrawerHeader>
+        <SavedCalculationsList @ref="_savedList" OnLoadCalculation="LoadCalculation" />
+    </MudDrawer>
+
+    @if (isComparisonMode)
+    {
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.h5" GutterBottom="true">方案 A</MudText>
+                    <LoanInputForm LoanInput="loanInputA" OnValidSubmit="CalculateComparison" />
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.h5" GutterBottom="true">方案 B</MudText>
+                    <MudToolBar Dense="true">
+                        <MudSpacer />
+                        <MudButton OnClick="CopyAToB" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ContentCopy">複製 A 到 B</MudButton>
+                        <MudButton OnClick="SwapScenarios" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.SwapHoriz">交換方案</MudButton>
+                    </MudToolBar>
+                    <LoanInputForm LoanInput="loanInputB" OnValidSubmit="CalculateComparison" />
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        @if (comparisonResultA != null && comparisonResultB != null)
+        {
+            <MudPaper Class="pa-4 mt-4">
+                <MudToolBar Gutters="false">
+                    <MudText Typo="Typo.h5">方案比較結果</MudText>
+                    <MudSpacer />
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ExportComparisonCsv" StartIcon="@Icons.Material.Filled.Download" Class="mr-2">匯出比較報表</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ShareComparison" StartIcon="@Icons.Material.Filled.Share">分享比較結果</MudButton>
+                </MudToolBar>
+                <ComparisonView ResultA="comparisonResultA" ResultB="comparisonResultB" />
+            </MudPaper>
+
+            <MudPaper Class="pa-4 mt-4">
+                <MudText Typo="Typo.h5" GutterBottom="true">方案比較圖表</MudText>
+                <MudChart ChartType="ChartType.Line" ChartSeries="@ComparisonSeries" XAxisLabels="@ComparisonXAxisLabels" Width="100%" Height="350px"></MudChart>
+            </MudPaper>
+        }
+    }
+    else
+    {
+        <MudPaper Class="pa-4">
+            <LoanInputForm LoanInput="loanInput" OnValidSubmit="Calculate" />
+        </MudPaper>
+
+        @if (result != null)
+        {
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">試算結果</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ExportCsv" StartIcon="@Icons.Material.Filled.Download">匯出 CSV</MudButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <MudCard Class="pa-4" Elevation="2">
+                                <MudText Typo="Typo.subtitle2">月付金 (首月)</MudText>
+                                <MudText Typo="Typo.h5" Color="Color.Primary">@result.MonthlyPayment.ToString("N0") 元</MudText>
+                            </MudCard>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudCard Class="pa-4" Elevation="2">
+                                <MudText Typo="Typo.subtitle2">總利息支出</MudText>
+                                <MudText Typo="Typo.h5" Color="Color.Secondary">@result.TotalInterest.ToString("N0") 元</MudText>
+                            </MudCard>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudCard Class="pa-4" Elevation="2">
+                                <MudText Typo="Typo.subtitle2">總還款金額</MudText>
+                                <MudText Typo="Typo.h5">@result.TotalPayment.ToString("N0") 元</MudText>
+                            </MudCard>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+
+            <MudPaper Class="pa-4 mt-4">
+                <MudText Typo="Typo.h5" GutterBottom="true">還款趨勢圖</MudText>
+                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+            </MudPaper>
+
+            <MudPaper Class="pa-4 mt-4">
+                <MudText Typo="Typo.h5" GutterBottom="true">還款明細表</MudText>
+                <AmortizationTable Schedule="@result.Schedule" />
+            </MudPaper>
+        }
+    }
+</MudContainer>
+
+@code {
+    private LoanInput loanInput = new();
+    private LoanResult? result;
+    
+    // Comparison Mode State
+    private bool isComparisonMode = false;
+    private LoanInput loanInputA = new();
+    private LoanInput loanInputB = new();
+    private LoanResult? comparisonResultA;
+    private LoanResult? comparisonResultB;
+
+    public List<ChartSeries> Series { get; set; } = new();
+    public string[] XAxisLabels { get; set; } = { };
+
+    public List<ChartSeries> ComparisonSeries { get; set; } = new();
+    public string[] ComparisonXAxisLabels { get; set; } = { };
+
+    private bool _drawerOpen = false;
+    private SavedCalculationsList _savedList;
+
+    private void ToggleHistory()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task SaveCalculation()
+    {
+        var inputToSave = isComparisonMode ? loanInputA : loanInput;
+
+        var parameters = new DialogParameters { ["Label"] = "Calculation Name", ["Value"] = $"Calculation {DateTime.Now:yyyy-MM-dd HH:mm}" };
+        var dialog = await DialogService.ShowAsync<PromptDialog>("Save Calculation", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var name = result.Data.ToString();
+            var savedCalc = new SavedCalculation
+            {
+                Id = Guid.NewGuid(),
+                Timestamp = DateTime.Now,
+                Name = name,
+                LoanInput = inputToSave
+            };
+            await StorageService.SaveCalculationAsync(savedCalc);
+            Snackbar.Add("Calculation saved!", Severity.Success);
+            if (_savedList != null) await _savedList.Refresh();
+        }
+    }
+
+    private void LoadCalculation(SavedCalculation calc)
+    {
+        if (isComparisonMode)
+        {
+            loanInputA = calc.LoanInput;
+        }
+        else
+        {
+            loanInput = calc.LoanInput;
+        }
+        
+        if (isComparisonMode) CalculateComparison();
+        else Calculate();
+        
+        _drawerOpen = false;
+        Snackbar.Add($"Loaded '{calc.Name}'", Severity.Info);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize with defaults
+        loanInput = new LoanInput { LoanTermYears = 30, AnnualInterestRate = 2.5 };
+        loanInputA = new LoanInput { LoanTermYears = 30, AnnualInterestRate = 2.5 };
+        loanInputB = new LoanInput { LoanTermYears = 30, AnnualInterestRate = 2.5 };
+
+        try 
+        {
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var query = uri.Query;
+            if (!string.IsNullOrEmpty(query) && query.Contains("data="))
+            {
+                var param = query.Split("data=")[1].Split("&")[0];
+                var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(Uri.UnescapeDataString(param)));
+                var data = System.Text.Json.JsonSerializer.Deserialize<ShareData>(json);
+                
+                if (data != null)
+                {
+                    isComparisonMode = data.Mode == "compare";
+                    if (data.SingleInput != null) loanInput = data.SingleInput;
+                    if (data.InputA != null) loanInputA = data.InputA;
+                    if (data.InputB != null) loanInputB = data.InputB;
+                    
+                    if (isComparisonMode)
+                    {
+                        CalculateComparison();
+                    }
+                    else
+                    {
+                        Calculate();
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing share data: {ex.Message}");
+            Snackbar.Add("無法載入分享的資料", Severity.Error);
+        }
+    }
+
+    private async Task ShareComparison()
+    {
+        var data = new ShareData
+        {
+            Mode = isComparisonMode ? "compare" : "single",
+            InputA = loanInputA,
+            InputB = loanInputB,
+            SingleInput = loanInput
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(data);
+        var base64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+        var url = NavigationManager.ToAbsoluteUri($"/?data={Uri.EscapeDataString(base64)}").ToString();
+
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+        Snackbar.Add("連結已複製到剪貼簿", Severity.Success);
+    }
+
+    private class ShareData
+    {
+        public string Mode { get; set; } = "single";
+        public LoanInput? InputA { get; set; }
+        public LoanInput? InputB { get; set; }
+        public LoanInput? SingleInput { get; set; }
+    }
+
+    private void Calculate()
+    {
+        result = CalculationService.CalculateLoan(loanInput);
+        UpdateChart();
+    }
+
+    private void CalculateComparison()
+    {
+        comparisonResultA = CalculationService.CalculateLoan(loanInputA);
+        comparisonResultB = CalculationService.CalculateLoan(loanInputB);
+        UpdateComparisonChart();
+    }
+
+    private void UpdateComparisonChart()
+    {
+        if (comparisonResultA == null || comparisonResultB == null) return;
+
+        // We'll use the longer term to define the X axis
+        var maxMonths = Math.Max(comparisonResultA.Schedule.Count, comparisonResultB.Schedule.Count);
+        var years = (int)Math.Ceiling(maxMonths / 12.0);
+        
+        var labels = new List<string>();
+        for (int i = 0; i <= years; i += 5) // Label every 5 years
+        {
+            labels.Add($"Y{i}");
+        }
+        ComparisonXAxisLabels = labels.ToArray();
+
+        // Prepare data points - we'll sample yearly to keep the chart clean
+        var dataPrincipalA = new List<double>();
+        var dataPrincipalB = new List<double>();
+
+        // Helper to get balance at year
+        double GetBalanceAtYear(LoanResult result, int year)
+        {
+            int monthIndex = year * 12;
+            if (monthIndex == 0) return (double)(result.TotalPayment - result.TotalInterest); // Initial balance
+            if (monthIndex >= result.Schedule.Count) return 0;
+            return (double)result.Schedule[monthIndex - 1].RemainingBalance;
+        }
+
+        for (int i = 0; i <= years; i += 5)
+        {
+            dataPrincipalA.Add(GetBalanceAtYear(comparisonResultA, i));
+            dataPrincipalB.Add(GetBalanceAtYear(comparisonResultB, i));
+        }
+
+        ComparisonSeries = new List<ChartSeries>()
+        {
+            new ChartSeries() { Name = "方案 A 剩餘本金", Data = dataPrincipalA.ToArray() },
+            new ChartSeries() { Name = "方案 B 剩餘本金", Data = dataPrincipalB.ToArray() },
+        };
+    }
+
+    private void CopyAToB()
+    {
+        // Deep copy or property copy
+        loanInputB = new LoanInput
+        {
+            LoanAmount = loanInputA.LoanAmount,
+            AnnualInterestRate = loanInputA.AnnualInterestRate,
+            LoanTermYears = loanInputA.LoanTermYears,
+            RepaymentType = loanInputA.RepaymentType,
+            GracePeriodMonths = loanInputA.GracePeriodMonths,
+            TotalPrice = loanInputA.TotalPrice,
+            LoanPercentage = loanInputA.LoanPercentage,
+            RateStages = new List<RateStage>(loanInputA.RateStages.Select(r => new RateStage { DurationMonths = r.DurationMonths, InterestRate = r.InterestRate }))
+        };
+        CalculateComparison();
+    }
+
+    private void SwapScenarios()
+    {
+        var tempInput = loanInputA;
+        loanInputA = loanInputB;
+        loanInputB = tempInput;
+
+        var tempResult = comparisonResultA;
+        comparisonResultA = comparisonResultB;
+        comparisonResultB = tempResult;
+        
+        UpdateComparisonChart();
+    }
+
+    private void UpdateChart()
+    {
+        if (result == null) return;
+
+        // Sample data points to avoid overcrowding the chart (e.g., every 12th month)
+        var sampledSchedule = result.Schedule.Where((x, i) => i % 12 == 0 || i == result.Schedule.Count - 1).ToList();
+
+        XAxisLabels = sampledSchedule.Select(x => $"第{x.Period}期").ToArray();
+
+        Series = new List<ChartSeries>()
+        {
+            new ChartSeries() { Name = "剩餘本金", Data = sampledSchedule.Select(x => (double)x.RemainingBalance).ToArray() },
+            new ChartSeries() { Name = "累計利息", Data = sampledSchedule.Select(x => (double)result.Schedule.Take(x.Period).Sum(s => s.InterestPayment)).ToArray() }
+        };
+    }
+
+    private async Task ExportCsv()
+    {
+        if (result == null) return;
+
+        var csvContent = "期數,本金,利息,本期還款,剩餘本金\n";
+        foreach (var item in result.Schedule)
+        {
+            csvContent += $"{item.Period},{item.PrincipalPayment},{item.InterestPayment},{item.TotalPayment},{item.RemainingBalance}\n";
+        }
+
+        var fileName = $"mortgage_schedule_{DateTime.Now:yyyyMMddHHmmss}.csv";
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(csvContent);
+        
+        await JSRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+    }
+
+    private async Task ExportComparisonCsv()
+    {
+        if (comparisonResultA == null || comparisonResultB == null) return;
+
+        var csvContent = "期數,方案A本金,方案A利息,方案A本期還款,方案A剩餘本金,方案B本金,方案B利息,方案B本期還款,方案B剩餘本金\n";
+        
+        var maxCount = Math.Max(comparisonResultA.Schedule.Count, comparisonResultB.Schedule.Count);
+        
+        for (int i = 0; i < maxCount; i++)
+        {
+            var itemA = i < comparisonResultA.Schedule.Count ? comparisonResultA.Schedule[i] : null;
+            var itemB = i < comparisonResultB.Schedule.Count ? comparisonResultB.Schedule[i] : null;
+            
+            var period = i + 1;
+            
+            var aPrincipal = itemA?.PrincipalPayment.ToString() ?? "0";
+            var aInterest = itemA?.InterestPayment.ToString() ?? "0";
+            var aPayment = itemA?.TotalPayment.ToString() ?? "0";
+            var aBalance = itemA?.RemainingBalance.ToString() ?? "0";
+            
+            var bPrincipal = itemB?.PrincipalPayment.ToString() ?? "0";
+            var bInterest = itemB?.InterestPayment.ToString() ?? "0";
+            var bPayment = itemB?.TotalPayment.ToString() ?? "0";
+            var bBalance = itemB?.RemainingBalance.ToString() ?? "0";
+
+            csvContent += $"{period},{aPrincipal},{aInterest},{aPayment},{aBalance},{bPrincipal},{bInterest},{bPayment},{bBalance}\n";
+        }
+
+        var fileName = $"mortgage_comparison_{DateTime.Now:yyyyMMddHHmmss}.csv";
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(csvContent);
+        
+        await JSRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+    }
+}

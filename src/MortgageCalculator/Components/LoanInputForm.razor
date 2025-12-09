@@ -1,0 +1,102 @@
+@using MortgageCalculator.Models
+@using MortgageCalculator.Components
+
+<EditForm Model="@LoanInput" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12">
+            <MudSwitch @bind-Value="isPercentageMode" Label="使用房價與成數計算" Color="Color.Primary" />
+        </MudItem>
+
+        @if (isPercentageMode)
+        {
+            <MudItem xs="12" sm="6">
+                <MudNumericField Value="LoanInput.TotalPrice" ValueChanged="@((decimal v) => OnTotalPriceChanged(v))" Label="房屋總價 (元)" Variant="Variant.Outlined" Min="0" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudNumericField Value="LoanInput.LoanPercentage" ValueChanged="@((double v) => OnPercentageChanged(v))" Label="貸款成數 (%)" Variant="Variant.Outlined" Min="0" Max="100" Step="5" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Percent" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudNumericField Value="@(LoanInput.TotalPrice - LoanInput.LoanAmount)" Label="自備款 (元)" Variant="Variant.Outlined" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+            </MudItem>
+        }
+
+        <MudItem xs="12" sm="6">
+            <MudNumericField @bind-Value="LoanInput.LoanAmount" Label="貸款金額 (元)" Variant="Variant.Outlined" Min="10000" ReadOnly="@isPercentageMode" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+            <ValidationMessage For="@(() => LoanInput.LoanAmount)" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudSwitch @bind-Value="isMultiStageRate" Label="使用分段利率" Color="Color.Secondary" />
+        </MudItem>
+
+        @if (isMultiStageRate)
+        {
+            <MudItem xs="12">
+                <MultiStageRateInput RateStages="LoanInput.RateStages" />
+            </MudItem>
+        }
+        else
+        {
+            <MudItem xs="12" sm="6">
+                <MudNumericField @bind-Value="LoanInput.AnnualInterestRate" Label="年利率 (%)" Variant="Variant.Outlined" Min="0.1" Step="0.1" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Percent" />
+                <ValidationMessage For="@(() => LoanInput.AnnualInterestRate)" />
+            </MudItem>
+        }
+
+        <MudItem xs="12" sm="6">
+            <MudNumericField @bind-Value="LoanInput.LoanTermYears" Label="貸款年限 (年)" Variant="Variant.Outlined" Min="1" />
+            <ValidationMessage For="@(() => LoanInput.LoanTermYears)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudSelect T="RepaymentType" Label="還款方式" Variant="Variant.Outlined" @bind-Value="LoanInput.RepaymentType">
+                <MudSelectItem Value="RepaymentType.PrincipalAndInterest">本息平均攤還</MudSelectItem>
+                <MudSelectItem Value="RepaymentType.PrincipalOnly">本金平均攤還</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudNumericField @bind-Value="LoanInput.GracePeriodMonths" Label="寬限期 (月)" Variant="Variant.Outlined" Min="0" />
+            <ValidationMessage For="@(() => LoanInput.GracePeriodMonths)" />
+        </MudItem>
+        <MudItem xs="12" class="d-flex justify-center">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large">試算</MudButton>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    [Parameter] public LoanInput LoanInput { get; set; } = new();
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    private bool isPercentageMode = false;
+    private bool isMultiStageRate = false;
+
+    private void OnTotalPriceChanged(decimal value)
+    {
+        LoanInput.TotalPrice = value;
+        CalculateLoanAmount();
+    }
+
+    private void OnPercentageChanged(double value)
+    {
+        LoanInput.LoanPercentage = value;
+        CalculateLoanAmount();
+    }
+
+    private void CalculateLoanAmount()
+    {
+        if (isPercentageMode)
+        {
+            LoanInput.LoanAmount = Math.Round(LoanInput.TotalPrice * (decimal)(LoanInput.LoanPercentage / 100), 0);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (!isMultiStageRate)
+        {
+            LoanInput.RateStages.Clear();
+        }
+        await OnValidSubmit.InvokeAsync();
+    }
+}
